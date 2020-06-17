@@ -10,7 +10,7 @@ img {
   height: auto;
 }
 h2 {
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
 }
 .grid-container {
   display: grid;
@@ -18,24 +18,23 @@ h2 {
   grid-gap: 1em;
 }
 
-
 /* hover styles */
 .location-listing {
   position: relative;
 }
 
-.location-image {
+.student-image {
   line-height: 0;
   overflow: hidden;
 }
 
-.location-image img {
+.student-image img {
   filter: blur(0px);
   transition: filter 0.3s ease-in;
   transform: scale(1.1);
 }
 
-.location-title {
+.student-title {
   font-size: 1.5em;
   font-weight: bold;
   text-decoration: none;
@@ -46,40 +45,43 @@ h2 {
   top: 0;
   left: 0;
   opacity: 0;
-  transition: opacity .5s;
-  background: rgba(90,0,10,0.4);
+  transition: opacity 0.5s;
+  background: rgba(90, 0, 10, 0.4);
   color: white;
-  
+
   /* position the text in t’ middle*/
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.location-listing:hover .location-title {
+.location-listing:hover .student-title {
   opacity: 1;
 }
 
-.location-listing:hover .location-image img {
+.location-listing:hover .student-image img {
   filter: blur(2px);
 }
 
-
 /* for touch screen devices */
-@media (hover: none) { 
-  .location-title {
+@media (hover: none) {
+  .student-title {
     opacity: 1;
   }
-  .location-image img {
+  .student-image img {
     filter: blur(2px);
   }
 }
 
 /* form */
-body {font-family: Arial, Helvetica, sans-serif;}
-* {box-sizing: border-box;}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
 
-.form-inline {  
+.form-inline {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
@@ -88,7 +90,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 .form-inline label {
   margin: 5px 10px 5px 0;
   font-size: 0.8em;
-  color: #0E2F5A;
+  color: #0e2f5a;
 }
 
 .form-inline input {
@@ -101,7 +103,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
 .form-inline button {
   padding: 10px 20px;
-  background-color: #0E2F5A;
+  background-color: #0e2f5a;
   border: 1px solid #ddd;
   color: white;
   cursor: pointer;
@@ -115,9 +117,103 @@ body {font-family: Arial, Helvetica, sans-serif;}
   .form-inline input {
     margin: 10px 0;
   }
-  
+
   .form-inline {
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* toast */
+#toast {
+  visibility: hidden;
+  max-width: 50px;
+  height: 50px;
+  /*margin-left: -125px;*/
+  margin: auto;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+
+  position: fixed;
+  z-index: 1;
+  left: 0;right:0;
+  bottom: 30px;
+  font-size: .9em;
+  white-space: nowrap;
+}
+#toast #img{
+width: 50px;
+height: 50px;
+  float: left;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+  background-color: #111;
+  color: #fff;
+}
+#toast #desc{
+
+  
+  color: #fff;
+ 
+  padding: 16px;
+  
+  overflow: hidden;
+white-space: nowrap;
+}
+
+#toast.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, expand 0.5s 0.5s,stay 3s 1s, shrink 0.5s 2s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, expand 0.5s 0.5s,stay 3s 1s, shrink 0.5s 4s, fadeout 0.5s 4.5s;
+}
+
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;} 
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes expand {
+  from {min-width: 50px} 
+  to {min-width: 350px}
+}
+
+@keyframes expand {
+  from {min-width: 50px}
+  to {min-width: 350px}
+}
+@-webkit-keyframes stay {
+  from {min-width: 350px} 
+  to {min-width: 350px}
+}
+
+@keyframes stay {
+  from {min-width: 350px}
+  to {min-width: 350px}
+}
+@-webkit-keyframes shrink {
+  from {min-width: 350px;} 
+  to {min-width: 50px;}
+}
+
+@keyframes shrink {
+  from {min-width: 350px;} 
+  to {min-width: 50px;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;} 
+  to {bottom: 60px; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 60px; opacity: 0;}
 }
