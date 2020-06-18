@@ -2,12 +2,11 @@ const CLOUD_NAME = "pictures77";
 const PRESET = "student-id";
 const BADGE_TRANSFORM = "t_v-badge";
 
-var cl = new cloudinary.Cloudinary({cloud_name: CLOUD_NAME, secure: true});
+var cl = new cloudinary.Cloudinary({ cloud_name: CLOUD_NAME, secure: true });
 
 var studentList = [];
 const IMG_HEIGHT = "505";
 const IMG_WIDTH = "345";
-
 
 function toast(message) {
   //TODO add color to message
@@ -21,20 +20,28 @@ function toast(message) {
 
 //student should have context data: fname, lname, title, org, fcolor
 //add URL and fullname
-function createStudentData(student){
-  let contextMap = (student && student.context)? student.context.custom :null;
-  if (!contextMap){
+function createStudentData(student) {
+  let contextMap = student && student.context ? student.context.custom : null;
+  if (!contextMap) {
     toast("Missing student data");
     return;
   }
-  let studentData = {...contextMap};
+  let studentData = { ...contextMap };
   studentData.publicId = student.public_id;
-  studentData.fullname = `${studentData.fname} ${studentData.lname}`;
+  studentData.fullname = `${encodeURI(studentData.fname)}%20${encodeURI(studentData.lname)}`;
+  studentData.org = encodeURI(studentData.org);
+  studentData.title = encodeURI(studentData.title);
+  let filler = Array(45).fill("%20").join("");
   //create overlay text
-  const overlayText = encodeURI(`!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${Array(45).fill(' ').join('')}!`);
-  studentData.URL = cl.url(studentData.publicId, cl.transformation().variables([["$data",`${overlayText}`]]).transformation("v-badge"));
+  const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`;
+  studentData.URL = cl.url(
+    studentData.publicId,
+    cl
+      .transformation()
+      .variables([["$data", `${overlayText}`]])
+      .transformation("v-badge")
+  );
   return studentData;
-
 }
 
 function createGalleryEntry(student) {
@@ -44,20 +51,20 @@ function createGalleryEntry(student) {
   const colorAnchor = document.createElement("a");
   colorAnchor.classList.add("student-color");
   const colorTextNode = document.createTextNode(student.fcolor);
-  colorAnchor.setAttribute("href","#");
+  colorAnchor.setAttribute("href", "#");
   colorAnchor.appendChild(colorTextNode);
   //image container
   const imageContainer = document.createElement("div");
   imageContainer.classList.add("student-image");
   //image anchor
   const imageAnchor = document.createElement("a");
-  imageContainer.setAttribute("href","#");
+  imageContainer.setAttribute("href", "#");
   //image
   const image = document.createElement("img");
-  image.setAttribute("width",IMG_WIDTH);
-  image.setAttribute("height",IMG_HEIGHT);
-  image.setAttribute("src",student.URL);
-  image.setAttribute("alt",student.fullname);
+  image.setAttribute("width", IMG_WIDTH);
+  image.setAttribute("height", IMG_HEIGHT);
+  image.setAttribute("src", student.URL);
+  image.setAttribute("alt", student.fullname);
   //glue it together
   imageAnchor.appendChild(image);
   imageContainer.appendChild(imageAnchor);
