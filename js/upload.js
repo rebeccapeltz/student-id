@@ -28,7 +28,9 @@ function createStudentData(student) {
   }
   let studentData = { ...contextMap };
   studentData.publicId = student.public_id;
-  studentData.fullname = `${encodeURI(studentData.fname)}%20${encodeURI(studentData.lname)}`;
+  studentData.fullname = `${encodeURI(studentData.fname)}%20${encodeURI(
+    studentData.lname
+  )}`;
   studentData.org = encodeURI(studentData.org);
   studentData.title = encodeURI(studentData.title);
   let filler = Array(45).fill("%20").join("");
@@ -94,14 +96,17 @@ function populateGallery(list) {
     document.querySelector("#gallery").appendChild(article);
   }
 }
-
-document.addEventListener("DOMContentLoaded", (event) => {
+function initGallery() {
   fetch("https://res.cloudinary.com/pictures77/image/list/student-id.json")
     .then((response) => response.json())
     .then((data) => {
       studentList = data.resources;
       populateGallery(studentList);
     });
+}
+
+document.addEventListener("DOMContentLoaded", (event) => {
+  initGallery();
 
   //after the list is ready add submit listener
   document.querySelector("#upload").addEventListener(
@@ -165,6 +170,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   });
               } else {
                 toast("Successful upload.");
+                //remove all gallery
+                document.querySelector("#gallery").innerHTML = "";
+                initGallery();
               }
 
               // https://api.cloudinary.com/v1_1/demo/delete_by_token -X POST --data 'token=delete_token
