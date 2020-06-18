@@ -1,6 +1,16 @@
-var studentList = [];
+const CLOUD_NAME = "pictures77";
+const PRESET = "student-id";
+const BADGE_TRANSFORM = "t_v-badge";
 
-function launch_toast(message) {
+var cl = new cloudinary.Cloudinary({cloud_name: CLOUD_NAME, secure: true});
+
+var studentList = [];
+const IMG_HEIGHT = "505";
+const IMG_WIDTH = "345";
+
+
+function toast(message) {
+  //TODO add color to message
   document.querySelector("#toast #desc").innerHTML = message;
   var x = document.getElementById("toast");
   x.className = "show";
@@ -9,13 +19,55 @@ function launch_toast(message) {
   }, 5000);
 }
 
-function populateGallery(list) {
-  for (const student in list) {
-    //create article
-    /*
+//student should have context data: fname, lname, title, org, fcolor
+//add URL and fullname
+function createStudentData(student){
+  let contextMap = (student && student.context)? student.context.custom :null;
+  if (!contextMap){
+    toast("Missing student data");
+    return;
+  }
+  let studentData = {...contextMap};
+  studentData.publicId = student.public_id;
+  studentData.fullname = `${studentData.fname} ${studentData.lname}`;
+  //create overlay text
+  const overlayText = encodeURI(`!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${Array(45).fill(' ').join('')}!`);
+  studentData.URL = cl.url(studentData.publicId, cl.transformation().variables([["$data",`${overlayText}`]]).transformation("v-badge"));
+  return studentData;
 
- <article id="3685" class="location-listing">
-        <a class="student-title" href="#">
+}
+
+function createGalleryEntry(student) {
+  const article = document.createElement("article");
+  article.classList.add("student-listing");
+  //what you see when you hover
+  const colorAnchor = document.createElement("a");
+  colorAnchor.classList.add("student-color");
+  const colorTextNode = document.createTextNode(student.fcolor);
+  colorAnchor.setAttribute("href","#");
+  colorAnchor.appendChild(colorTextNode);
+  //image container
+  const imageContainer = document.createElement("div");
+  imageContainer.classList.add("student-image");
+  //image anchor
+  const imageAnchor = document.createElement("a");
+  imageContainer.setAttribute("href","#");
+  //image
+  const image = document.createElement("img");
+  image.setAttribute("width",IMG_WIDTH);
+  image.setAttribute("height",IMG_HEIGHT);
+  image.setAttribute("src",student.URL);
+  image.setAttribute("alt",student.fullname);
+  //glue it together
+  imageAnchor.appendChild(image);
+  imageContainer.appendChild(imageAnchor);
+  article.appendChild(colorAnchor);
+  article.appendChild(imageContainer);
+  return article;
+  /*
+
+ <article id="3685" class="student-listing">
+        <a class="student-color" href="#">
           Susan </a>
         <div class="student-image">
           <a href="#">
@@ -26,7 +78,13 @@ function populateGallery(list) {
       </article>
 
     */
+}
+function populateGallery(list) {
+  for (const student of list) {
+    const studentData = createStudentData(student);
+    const article = createGalleryEntry(studentData);
     //append to gallery
+    document.querySelector("#gallery").appendChild(article);
   }
 }
 
@@ -35,6 +93,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     .then((response) => response.json())
     .then((data) => {
       studentList = data.resources;
+      populateGallery(studentList);
     });
 
   //after the list is ready add submit listener
@@ -58,8 +117,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
       var myWidget = cloudinary.createUploadWidget(
         {
-          cloudName: "pictures77",
-          upload_preset: "student-id",
+          cloudName: CLOUD_NAME,
+          upload_preset: PRESET,
           sources: ["local", "url", "camera", "facebook"],
           context: contextMap,
           clientAllowedFormats: ["png", "gif", "jpeg"],
@@ -91,27 +150,21 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   })
                   .then((data) => {
                     console.log("error deleting image without face", data);
-                    launch_toast(
-                      "Can't accept image because it doesn't have a face."
-                    );
+                    toast("Can't accept image because it doesn't have a face.");
                     // alert("face deleted!")
                   })
                   .catch((error) => {
                     console.log("error", error);
                   });
               } else {
-                launch_toast(
-                  "Successful upload."
-                );
+                toast("Successful upload.");
               }
 
               // https://api.cloudinary.com/v1_1/demo/delete_by_token -X POST --data 'token=delete_token
             }
           } else {
             console.log(error);
-            launch_toast(
-              `Upload error: ${error}`
-            );
+            launch_toast(`Upload error: ${error}`);
           }
         }
       );
