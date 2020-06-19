@@ -58,12 +58,12 @@ function createGalleryEntry(student) {
   const article = document.createElement("article");
   article.classList.add("student-listing");
   //what you see when you hover
-  const colorAnchor = document.createElement("a");
-  colorAnchor.classList.add("student-color");
-  const colorTextNode = document.createTextNode(student.fcolor);
-  colorAnchor.setAttribute("href", "#");
-  colorAnchor.setAttribute("style", `color:${student.fcolor}`);
-  colorAnchor.appendChild(colorTextNode);
+  // const colorAnchor = document.createElement("a");
+  // colorAnchor.classList.add("student-color");
+  // const colorTextNode = document.createTextNode(student.fcolor);
+  // colorAnchor.setAttribute("href", "#");
+  // colorAnchor.setAttribute("style", `color:${student.fcolor}`);
+  // colorAnchor.appendChild(colorTextNode);
   //image container
   const imageContainer = document.createElement("div");
   imageContainer.classList.add("student-image");
@@ -79,7 +79,7 @@ function createGalleryEntry(student) {
   //glue it together
   imageAnchor.appendChild(image);
   imageContainer.appendChild(imageAnchor);
-  article.appendChild(colorAnchor);
+  // article.appendChild(colorAnchor);
   article.appendChild(imageContainer);
   return article;
 }
