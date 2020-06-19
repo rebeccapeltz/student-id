@@ -128,12 +128,15 @@ body {
   .form-inline button {
     margin: 0 0 0 5px;
   }
+  .form-inline input {
+    margin: 5px 10px 5px 0;
+  }
+
 }
 @media (max-width: 800px) {
-  .form-inline input {
-    /* margin: 10px 0; */
-    margin: 0;
-  }
+  /* .form-inline input {
+    margin: 10px 0;
+  } */
 
   .form-inline {
     flex-direction: column;
