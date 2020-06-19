@@ -1,3 +1,5 @@
 .env
 my-notes.md
 node_modules/
+test/
+marketing/
