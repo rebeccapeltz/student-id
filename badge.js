@@ -14,7 +14,7 @@ let data1 = encodeURI(
   )}`
 );
 let publicId1 = "student-id/71e077dcf88c5e9772cd09a072b8ae39"
-let publicId2 = "student-id/0c05701c223b0f32b6f064efae191b9c";
+let publicId2 = "student-id/b3d5d1066394dbcc8532f3e33b402af7";
 let name2 = "Susan Burnell";
 let title2 = "Astrophysicist";
 let org2 = "Cambridge University";
@@ -44,7 +44,7 @@ const url = cloudinary.url(`${publicId2}`, {
       color: "#DB8226",
       background: "#0E2F5A",
       width: 345,
-      y: "-160",
+      y: "-140",
 
     
 });

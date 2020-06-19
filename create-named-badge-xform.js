@@ -16,7 +16,7 @@ cloudinary.api
         color: "#DB8226",
         background: "#0E2F5A",
         width: 345,
-        y: "-150",
+        y: "-140",
       },
     ],
   })
