@@ -68,14 +68,14 @@ h2 {
 }*/
 
 /* for touch screen devices */
-@media (hover: none) {
+/* @media (hover: none) {
   .student-color {
     opacity: 1;
   }
   .student-image img {
     filter: blur(2px);
   }
-}
+} */
 
 /* form */
 body {
