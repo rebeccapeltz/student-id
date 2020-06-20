@@ -202,6 +202,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     });
                 } else {
                   toast("Successful upload.", "info");
+                  clearForm();
                   //remove all gallery
                   document.querySelector("#gallery").innerHTML = "";
                   initGallery();
