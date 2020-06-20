@@ -101,11 +101,11 @@ function initGallery() {
     });
 }
 function clearForm(){
-  document.querySelector("#fname").innerHTML = "";
-  document.querySelector("#lname").innerHTML = "";
-  document.querySelector("#title").innerHTML = "";
-  document.querySelector("#org").innerHTML = "";
-  document.querySelector("#fcolor").innerHTML = "";
+  document.querySelector("#fname").value = "";
+  document.querySelector("#lname").value = "";
+  document.querySelector("#title").value = "";
+  document.querySelector("#org").value = "";
+  document.querySelector("#fcolor").value = "";
 }
 
 // gather form data into context map
