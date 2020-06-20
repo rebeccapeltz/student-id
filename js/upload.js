@@ -100,6 +100,13 @@ function initGallery() {
       populateGallery(studentList);
     });
 }
+function clearForm(){
+  document.querySelector("#fname").innerHTML = "";
+  document.querySelector("#lname").innerHTML = "";
+  document.querySelector("#title").innerHTML = "";
+  document.querySelector("#org").innerHTML = "";
+  document.querySelector("#fcolor").innerHTML = "";
+}
 
 // gather form data into context map
 function createContextMap() {
@@ -193,6 +200,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                       console.log("error", error);
                     });
                 } else {
+                  clearForm();
                   toast("Successful upload.", "info");
                   //remove all gallery
                   document.querySelector("#gallery").innerHTML = "";
