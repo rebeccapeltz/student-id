@@ -190,6 +190,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     })
                     .then((data) => {
                       console.log("error deleting image without face", data);
+                      clearForm();
                       toast(
                         "Can't accept image because it doesn't have a face.",
                         "warning"
@@ -200,7 +201,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                       console.log("error", error);
                     });
                 } else {
-                  clearForm();
                   toast("Successful upload.", "info");
                   //remove all gallery
                   document.querySelector("#gallery").innerHTML = "";
