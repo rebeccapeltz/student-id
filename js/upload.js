@@ -26,21 +26,36 @@ function toast(message, type) {
   }, 5000);
 }
 
+function specialEscape(str) {
+  if (!str) return "";
+  let arr = str.split("");
+  let newArr = [];
+
+  for (let c of arr) {
+    newArr.push(encodeURIComponent(encodeURIComponent(c)));
+  }
+  let newStr = newArr.join("");
+  return newStr;
+}
+
 //student should have context data: fname, lname, title, org, fcolor
 //add URL and fullname
 function createStudentData(student) {
   let contextMap = student && student.context ? student.context.custom : null;
   if (!contextMap) {
-    toast("Missing student data");
-    return;
+    // toast("Missing student data");
+    //a student with no context
+    console.log("No context:", JSON.stringify(student, null, 2));
+    // create dummy context values
+    contextMap = {public_id:"", fname:"", lname:"", fcolor:"",title:"", org:""};
   }
   let studentData = { ...contextMap };
-  studentData.publicId = student.public_id;
-  studentData.fullname = `${encodeURI(studentData.fname)}%20${encodeURI(
-    studentData.lname
-  )}`;
-  studentData.org = encodeURI(studentData.org);
-  studentData.title = encodeURI(studentData.title);
+  studentData.publicId = student.public_id || "";
+  studentData.fullname = `${specialEscape(
+    studentData.fname || ""
+  )}%20${specialEscape(studentData.lname || "")}`;
+  studentData.org = specialEscape(studentData.org|| "");
+  studentData.title = specialEscape(studentData.title|| "");
   let filler = Array(45).fill("%20").join("");
   //create overlay text
   const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`;
@@ -86,9 +101,11 @@ function createGalleryEntry(student) {
 function populateGallery(list) {
   for (const student of list) {
     const studentData = createStudentData(student);
-    const article = createGalleryEntry(studentData);
-    //append to gallery
-    document.querySelector("#gallery").appendChild(article);
+    if (studentData) {
+      const article = createGalleryEntry(studentData);
+      //append to gallery
+      document.querySelector("#gallery").appendChild(article);
+    } 
   }
 }
 function initGallery() {
@@ -100,7 +117,7 @@ function initGallery() {
       populateGallery(studentList);
     });
 }
-function clearForm(){
+function clearForm() {
   document.querySelector("#fname").value = "";
   document.querySelector("#lname").value = "";
   document.querySelector("#title").value = "";
@@ -131,6 +148,7 @@ function createContextMap() {
 function dupFound(contextMap, studentList) {
   //filter on fname, lname, company, title
   var result = studentList.filter((student) => {
+    if (!student.context) return false;
     return (
       student.context.custom.fname === contextMap.fname &&
       student.context.custom.lname === contextMap.lname &&
@@ -141,8 +159,34 @@ function dupFound(contextMap, studentList) {
   return result.length > 0;
 }
 
+//boolean true enables the button and boolean false disable
+function setUploadButton(enable) {
+  if (enable) {
+    document.querySelector("#upload").removeAttribute("disabled");
+  } else {
+    document.querySelector("#upload").setAttribute("disabled", "disabled");
+  }
+}
+
+function inputChanged(){
+  if (document.querySelector("#fname").value.length>0 && document.querySelector("#lname").value.length>0 && 
+  document.querySelector("#title").value.length > 0 &&
+  document.querySelector("#org").value.length > 0 &&
+  document.querySelector("#fcolor").value.length >0){
+    setUploadButton(true);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
+  //disable upload button
+  setUploadButton(false);
   initGallery();
+
+  document.querySelectorAll("input").forEach( el=>{
+    el.addEventListener("change", inputChanged, false); 
+  })
+  
+
 
   //after the list is ready add submit listener
   document.querySelector("#upload").addEventListener(
@@ -168,7 +212,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (!error) {
               console.log("event", result.event);
               // if (result.event === 'upload-added') {
-              if (result.event === "success") {
+              if (result.event === "close") {
                 console.log(result);
 
                 //delete if the upload doesn't contain a face
@@ -223,3 +267,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
     false
   );
 });
+
+//escape: https://support.cloudinary.com/hc/en-us/articles/202521512-How-to-add-a-slash-character-or-any-other-special-characters-in-text-overlays-
