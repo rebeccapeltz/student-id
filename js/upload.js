@@ -47,15 +47,22 @@ function createStudentData(student) {
     //a student with no context
     console.log("No context:", JSON.stringify(student, null, 2));
     // create dummy context values
-    contextMap = {public_id:"", fname:"", lname:"", fcolor:"",title:"", org:""};
+    contextMap = {
+      public_id: "",
+      fname: "",
+      lname: "",
+      fcolor: "",
+      title: "",
+      org: "",
+    };
   }
   let studentData = { ...contextMap };
   studentData.publicId = student.public_id || "";
   studentData.fullname = `${specialEscape(
     studentData.fname || ""
   )}%20${specialEscape(studentData.lname || "")}`;
-  studentData.org = specialEscape(studentData.org|| "");
-  studentData.title = specialEscape(studentData.title|| "");
+  studentData.org = specialEscape(studentData.org || "");
+  studentData.title = specialEscape(studentData.title || "");
   let filler = Array(45).fill("%20").join("");
   //create overlay text
   const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`;
@@ -72,13 +79,6 @@ function createStudentData(student) {
 function createGalleryEntry(student) {
   const article = document.createElement("article");
   article.classList.add("student-listing");
-  //what you see when you hover
-  // const colorAnchor = document.createElement("a");
-  // colorAnchor.classList.add("student-color");
-  // const colorTextNode = document.createTextNode(student.fcolor);
-  // colorAnchor.setAttribute("href", "#");
-  // colorAnchor.setAttribute("style", `color:${student.fcolor}`);
-  // colorAnchor.appendChild(colorTextNode);
   //image container
   const imageContainer = document.createElement("div");
   imageContainer.classList.add("student-image");
@@ -105,17 +105,26 @@ function populateGallery(list) {
       const article = createGalleryEntry(studentData);
       //append to gallery
       document.querySelector("#gallery").appendChild(article);
-    } 
+    }
   }
 }
-function initGallery() {
+
+function renderStudents(){
   fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`)
-    .then((response) => response.json())
-    .then((data) => {
-      //populate global studentList with image and meta-data
-      studentList = data.resources;
-      populateGallery(studentList);
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        //populate global studentList with image and meta-data
+        studentList = data.resources;
+        populateGallery(studentList);
+      })
+      .catch(error=>{
+        console.log("error fetching list")
+      })
+}
+function initGallery() {
+  console.log("init gallery");
+  window.setTimeout(renderStudents,2000);
 }
 function clearForm() {
   document.querySelector("#fname").value = "";
@@ -168,11 +177,14 @@ function setUploadButton(enable) {
   }
 }
 
-function inputChanged(){
-  if (document.querySelector("#fname").value.length>0 && document.querySelector("#lname").value.length>0 && 
-  document.querySelector("#title").value.length > 0 &&
-  document.querySelector("#org").value.length > 0 &&
-  document.querySelector("#fcolor").value.length >0){
+function inputChanged() {
+  if (
+    document.querySelector("#fname").value.length > 0 &&
+    document.querySelector("#lname").value.length > 0 &&
+    document.querySelector("#title").value.length > 0 &&
+    document.querySelector("#org").value.length > 0 &&
+    document.querySelector("#fcolor").value.length > 0
+  ) {
     setUploadButton(true);
   }
 }
@@ -182,11 +194,32 @@ document.addEventListener("DOMContentLoaded", (event) => {
   setUploadButton(false);
   initGallery();
 
-  document.querySelectorAll("input").forEach( el=>{
-    el.addEventListener("change", inputChanged, false); 
-  })
-  
+  document.querySelectorAll("input").forEach((el) => {
+    el.addEventListener("input", inputChanged, false);
+  });
 
+  function deleteNoFaceImage(result) {
+    const token = { token: result.info.delete_token };
+    fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(token),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log("error deleting image without face", data);
+        clearForm();
+        toast("Failed: image must have a face.", "warning");
+        // alert("face deleted!")
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
+  }
 
   //after the list is ready add submit listener
   document.querySelector("#upload").addEventListener(
@@ -212,38 +245,39 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (!error) {
               console.log("event", result.event);
               // if (result.event === 'upload-added') {
-              if (result.event === "close") {
+              if (result.event === "success") {
                 console.log(result);
 
                 //delete if the upload doesn't contain a face
                 if (!result.info.faces || result.info.faces.length === 0) {
-                  // alert("no face!")
-                  const token = { token: result.info.delete_token };
-                  fetch(
-                    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`,
-                    {
-                      method: "post",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify(token),
-                    }
-                  )
-                    .then((response) => {
-                      return response.json();
-                    })
-                    .then((data) => {
-                      console.log("error deleting image without face", data);
-                      clearForm();
-                      toast(
-                        "Can't accept image because it doesn't have a face.",
-                        "warning"
-                      );
-                      // alert("face deleted!")
-                    })
-                    .catch((error) => {
-                      console.log("error", error);
-                    });
+                  console.log("no face!");
+                  deleteNoFaceImage(result);
+                  // const token = { token: result.info.delete_token };
+                  // fetch(
+                  //   `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`,
+                  //   {
+                  //     method: "post",
+                  //     headers: {
+                  //       "Content-Type": "application/json",
+                  //     },
+                  //     body: JSON.stringify(token),
+                  //   }
+                  // )
+                  //   .then((response) => {
+                  //     return response.json();
+                  //   })
+                  //   .then((data) => {
+                  //     console.log("error deleting image without face", data);
+                  //     clearForm();
+                  //     toast(
+                  //       "Failed: image must have a face.",
+                  //       "warning"
+                  //     );
+                  //     // alert("face deleted!")
+                  //   })
+                  //   .catch((error) => {
+                  //     console.log("error", error);
+                  //   });
                 } else {
                   toast("Successful upload.", "info");
                   clearForm();
@@ -267,5 +301,3 @@ document.addEventListener("DOMContentLoaded", (event) => {
     false
   );
 });
-
-//escape: https://support.cloudinary.com/hc/en-us/articles/202521512-How-to-add-a-slash-character-or-any-other-special-characters-in-text-overlays-
