@@ -4,29 +4,43 @@ const PRESET = "student-id";
 const BADGE_TRANSFORM = "t_v-badge";
 const NOT_ALLOW_DUPS = true;
 
-var cl = new cloudinary.Cloudinary({ cloud_name: CLOUD_NAME, secure: true });
+const cl = new cloudinary.Cloudinary({ cloud_name: CLOUD_NAME, secure: true });
 
-var studentList = [];
+const studentList = [];
 const IMG_HEIGHT = "485";
 const IMG_WIDTH = "345";
 
 function toast(message, type) {
-  //TODO add color to message
-  const toastEl = document.querySelector("#toast");
-  toastEl.className = "show";
-  document.querySelector("#toast #desc").innerHTML = message;
-  document.querySelector("#toast #img").innerHTML =
-    type && type === "warning" ? "!" : "OK";
+  console.log("toast:", message, type);
+  const fromColor = type === "warn" ? "pink" : "#00b09b";
+  const toColor = type === "warn" ? "red" : "#96c93d";
+  Toastify({
+    text: message,
+    duration: 3000,
+    close: true,
+    gravity: "top", // `top` or `bottom`
+    position: "left", // `left`, `center` or `right`
+    backgroundColor: `linear-gradient(to right, ${fromColor}, ${toColor})`,
+    stopOnFocus: true, // Prevents dismissing of toast on hover
+  }).showToast();
 
-  const typeClass = `toast-${type}`;
-  toastEl.classList.add(typeClass);
-  setTimeout(function () {
-    toastEl.className = toastEl.className.replace("show", "");
-    toastEl.classList.remove(typeClass);
-  }, 5000);
+  //TODO add color to message
+  // const toastEl = document.querySelector("#toast");
+  // toastEl.className = "show";
+  // document.querySelector("#toast #desc").innerHTML = message;
+  // document.querySelector("#toast #img").innerHTML =
+  //   type && type === "warning" ? "!" : "OK";
+
+  // const typeClass = `toast-${type}`;
+  // toastEl.classList.add(typeClass);
+  // setTimeout(function () {
+  //   toastEl.className = toastEl.className.replace("show", "");
+  //   toastEl.classList.remove(typeClass);
+  // }, 5000);
 }
 
-function specialEscape(str) {
+function doubleEncode(str) {
+  console.log("double encode");
   if (!str) return "";
   let arr = str.split("");
   let newArr = [];
@@ -41,6 +55,7 @@ function specialEscape(str) {
 //student should have context data: fname, lname, title, org, fcolor
 //add URL and fullname
 function createStudentData(student) {
+  console.log("createStudentData:", JSON.stringify(student, null, 2));
   let contextMap = student && student.context ? student.context.custom : null;
   if (!contextMap) {
     // toast("Missing student data");
@@ -56,16 +71,18 @@ function createStudentData(student) {
       org: "",
     };
   }
+  // all data that will appear in overlay must be double encoded
   let studentData = { ...contextMap };
   studentData.publicId = student.public_id || "";
-  studentData.fullname = `${specialEscape(
+  studentData.fullname = `${doubleEncode(
     studentData.fname || ""
-  )}%20${specialEscape(studentData.lname || "")}`;
-  studentData.org = specialEscape(studentData.org || "");
-  studentData.title = specialEscape(studentData.title || "");
+  )}%20${doubleEncode(studentData.lname || "")}`;
+  studentData.org = doubleEncode(studentData.org || "");
+  studentData.title = doubleEncode(studentData.title || "");
   let filler = Array(45).fill("%20").join("");
   //create overlay text
   const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`;
+  //create badge URL
   studentData.URL = cl.url(
     studentData.publicId,
     cl
@@ -76,7 +93,9 @@ function createStudentData(student) {
   return studentData;
 }
 
+//create HTML
 function createGalleryEntry(student) {
+  console.log("createGalleryEntry:", JSON.stringify(student, null, 2));
   const article = document.createElement("article");
   article.classList.add("student-listing");
   //image container
@@ -94,39 +113,40 @@ function createGalleryEntry(student) {
   //glue it together
   imageAnchor.appendChild(image);
   imageContainer.appendChild(imageAnchor);
-  // article.appendChild(colorAnchor);
   article.appendChild(imageContainer);
   return article;
 }
 function populateGallery(list) {
   for (const student of list) {
-    const studentData = createStudentData(student);
-    if (studentData) {
-      const article = createGalleryEntry(studentData);
+    const encodedStudentData = createStudentData(student);
+    if (encodedStudentData) {
+      const article = createGalleryEntry(encodedStudentData);
       //append to gallery
       document.querySelector("#gallery").appendChild(article);
     }
   }
 }
 
-function renderStudents(){
+function loadStudents() {
+  console.log("loadStudents");
   fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        //populate global studentList with image and meta-data
-        studentList = data.resources;
-        populateGallery(studentList);
-      })
-      .catch(error=>{
-        console.log("error fetching list")
-      })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      //populate global studentList with image and meta-data
+      studentList.push(...data.resources);
+      console.log("list student count:", studentList.length);
+      console.log("list 1:", JSON.stringify(studentList[0], null, 2));
+      populateGallery(studentList);
+    })
+    .catch((error) => {
+      console.log("error fetching list");
+    });
 }
-function initGallery() {
-  console.log("init gallery");
-  window.setTimeout(renderStudents,2000);
-}
+
+// clear form after successful image upload
 function clearForm() {
+  console.log("clearForm");
   document.querySelector("#fname").value = "";
   document.querySelector("#lname").value = "";
   document.querySelector("#title").value = "";
@@ -136,6 +156,7 @@ function clearForm() {
 
 // gather form data into context map
 function createContextMap() {
+  console.log("createContextMap");
   const fname = document.querySelector("#fname").value;
   const lname = document.querySelector("#lname").value;
   const title = document.querySelector("#title").value;
@@ -155,7 +176,7 @@ function createContextMap() {
 
 //check if a student with same info has already signed up
 function dupFound(contextMap, studentList) {
-  //filter on fname, lname, company, title
+  console.log("dupFound");
   var result = studentList.filter((student) => {
     if (!student.context) return false;
     return (
@@ -170,6 +191,7 @@ function dupFound(contextMap, studentList) {
 
 //boolean true enables the button and boolean false disable
 function setUploadButton(enable) {
+  console.log("setUploadButton");
   if (enable) {
     document.querySelector("#upload").removeAttribute("disabled");
   } else {
@@ -177,7 +199,9 @@ function setUploadButton(enable) {
   }
 }
 
+//require all input data before image upload enabled
 function inputChanged() {
+  console.log("inputChanged");
   if (
     document.querySelector("#fname").value.length > 0 &&
     document.querySelector("#lname").value.length > 0 &&
@@ -189,108 +213,104 @@ function inputChanged() {
   }
 }
 
+//use a delete token to delete an image
+function deleteNoFaceImage(result) {
+  console.log("deleteNoFaceImage");
+  const token = { token: result.info.delete_token };
+  fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(token),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(
+        "success deleting image without face",
+        JSON.stringify(data, null, 2)
+      );
+      toast("Image uploaded must have a face.", "warn");
+    })
+    .catch((error) => {
+      console.log("error deleting face", error);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
   //disable upload button
   setUploadButton(false);
-  initGallery();
+  loadStudents();
 
+  //listen for form inputs
   document.querySelectorAll("input").forEach((el) => {
     el.addEventListener("input", inputChanged, false);
   });
-
-  function deleteNoFaceImage(result) {
-    const token = { token: result.info.delete_token };
-    fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(token),
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        console.log("error deleting image without face", data);
-        clearForm();
-        toast("Failed: image must have a face.", "warning");
-        // alert("face deleted!")
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
-  }
 
   //after the list is ready add submit listener
   document.querySelector("#upload").addEventListener(
     "click",
     function () {
+      console.log("UW click handler");
       const contextMap = createContextMap();
-      console.log(contextMap);
+      console.log("contextMap", contextMap);
       //verify form values collected - check that there is no existing student with same name and company
       if (NOT_ALLOW_DUPS && dupFound(contextMap, studentList)) {
-        toast("Duplicates not allowed", "warning");
+        toast("Duplicates not allowed", "warn");
         return;
       } else {
         var myWidget = cloudinary.createUploadWidget(
           {
             cloudName: CLOUD_NAME,
             upload_preset: PRESET,
-            sources: ["local", "url", "camera", "facebook"],
+            sources: ["local", "url", "camera"],
             context: contextMap,
             clientAllowedFormats: ["png", "gif", "jpeg"],
             return_delete_token: 1,
           },
           (error, result) => {
+            //wait for success
             if (!error) {
-              console.log("event", result.event);
-              // if (result.event === 'upload-added') {
+              console.log("UW non error event", result.event);
               if (result.event === "success") {
-                console.log(result);
+                console.log("success:", JSON.stringify(result, null, 2));
+                //disable the upload button
+                setUploadButton(false);
 
-                //delete if the upload doesn't contain a face
-                if (!result.info.faces || result.info.faces.length === 0) {
-                  console.log("no face!");
-                  deleteNoFaceImage(result);
-                  // const token = { token: result.info.delete_token };
-                  // fetch(
-                  //   `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`,
-                  //   {
-                  //     method: "post",
-                  //     headers: {
-                  //       "Content-Type": "application/json",
-                  //     },
-                  //     body: JSON.stringify(token),
-                  //   }
-                  // )
-                  //   .then((response) => {
-                  //     return response.json();
-                  //   })
-                  //   .then((data) => {
-                  //     console.log("error deleting image without face", data);
-                  //     clearForm();
-                  //     toast(
-                  //       "Failed: image must have a face.",
-                  //       "warning"
-                  //     );
-                  //     // alert("face deleted!")
-                  //   })
-                  //   .catch((error) => {
-                  //     console.log("error", error);
-                  //   });
-                } else {
-                  toast("Successful upload.", "info");
+                //test that a face was uploaded
+                if (
+                  result.info &&
+                  result.info.faces &&
+                  result.info.faces.length > 0
+                ) {
+                  toast("Successful face upload.", "info");
                   clearForm();
-                  //remove all gallery
-                  document.querySelector("#gallery").innerHTML = "";
-                  initGallery();
-                }
+                  //add image to gallery
+                  // XXXXXXXXXXdocument.querySelector("#gallery").innerHTML = "";
 
-                // https://api.cloudinary.com/v1_1/demo/delete_by_token -X POST --data 'token=delete_token
+                  //TODO TRY add to list add to DOM - otherwise need to call load
+                  // add student to list
+                  studentList.push(result.info);
+                  console.log(
+                    "new student added:",
+                    JSON.stringify(studentList)
+                  );
+                  // add article to DOM
+                  // const article = createGalleryEntry(result.info);
+                  // document.querySelector("#gallery").appendChild(article);
+
+                  // put new student in an array and send to populate
+                  populateGallery([result.info])
+                } else {
+                  console.log("Successful upload but no face!");
+                  deleteNoFaceImage(result);
+                }
               }
             } else {
-              console.log(error);
-              launch_toast(`Upload error: ${error}`, "warning");
+              console.log("UW error event", error);
+              launch_toast(`Upload error: ${error}`, "warn");
             }
           }
         );
