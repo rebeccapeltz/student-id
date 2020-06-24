@@ -132,11 +132,11 @@ function loadStudents() {
   fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+      console.log("fetched data",data.resources.length,data.resources);
       //populate global studentList with image and meta-data
       studentList.push(...data.resources);
-      console.log("list student count:", studentList.length);
-      console.log("list 1:", JSON.stringify(studentList[0], null, 2));
+      // console.log("list student count:", studentList.length);
+      // console.log("list 1:", JSON.stringify(studentList[0], null, 2));
       populateGallery(studentList);
     })
     .catch((error) => {
@@ -307,6 +307,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   console.log("Successful upload but no face!");
                   deleteNoFaceImage(result);
                 }
+              }
+              if (result.event === "done") {
+                console.log("done event:", result.info);
               }
             } else {
               console.log("UW error event", error);
