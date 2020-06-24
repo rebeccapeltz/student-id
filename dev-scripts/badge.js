@@ -43,7 +43,7 @@ const url = cloudinary.url(`${publicId2}`, {
       gravity: "south",
       color: "#DB8226",
       background: "#0E2F5A",
-      width: 345,
+      width: 300,
       y: "-140",
 
     

@@ -7,8 +7,8 @@ const NOT_ALLOW_DUPS = true;
 const cl = new cloudinary.Cloudinary({ cloud_name: CLOUD_NAME, secure: true });
 
 const studentList = [];
-const IMG_HEIGHT = "485";
-const IMG_WIDTH = "345";
+const IMG_HEIGHT = "440";
+const IMG_WIDTH = "300";
 
 function toast(message, type) {
   console.log("toast:", message, type);
@@ -130,17 +130,28 @@ function populateGallery(list) {
 function loadStudents() {
   console.log("loadStudents");
   fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`)
-    .then((response) => response.json())
+    .then((response) => {
+      console.log("fetch status:", response.status);
+      if (response.status === 200) {
+        console.log(response);
+        response.json();
+      } else if (response.status === 404) {
+        //TODO announce no users yet
+        toast("No student data yet.", "info");
+      }
+    })
     .then((data) => {
-      console.log("fetched data",data.resources.length,data.resources);
-      //populate global studentList with image and meta-data
-      studentList.push(...data.resources);
-      // console.log("list student count:", studentList.length);
-      // console.log("list 1:", JSON.stringify(studentList[0], null, 2));
-      populateGallery(studentList);
+      // console.log("fetched data",data.resources.length,data.resources);
+      if (data && data.resources) {
+        console.log("fetched data", data.resources.length);
+
+        //populate global studentList with image and meta-data
+        studentList.push(...data.resources);
+        populateGallery(studentList);
+      }
     })
     .catch((error) => {
-      console.log("error fetching list");
+      console.log("error fetching list", error);
     });
 }
 
@@ -243,6 +254,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   //disable upload button
   setUploadButton(false);
   loadStudents();
+  // setTimeout(loadStudents, 5000);
 
   //listen for form inputs
   document.querySelectorAll("input").forEach((el) => {
@@ -302,7 +314,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   // document.querySelector("#gallery").appendChild(article);
 
                   // put new student in an array and send to populate
-                  populateGallery([result.info])
+                  populateGallery([result.info]);
                 } else {
                   console.log("Successful upload but no face!");
                   deleteNoFaceImage(result);

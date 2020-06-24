@@ -2,7 +2,7 @@ require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.api
-  .create_transformation("v-badge", {
+  .update_transformation("v-badge", {
     transformation: [
       {
         overlay: {
@@ -15,7 +15,7 @@ cloudinary.api
         gravity: "south",
         color: "#DB8226",
         background: "#0E2F5A",
-        width: 345,
+        width: 300,
         y: "-140",
       },
     ],

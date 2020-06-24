@@ -14,8 +14,8 @@ cloudinary.api.create_upload_preset({
   type: "upload",
   tags: "student-id",
   transformation: [{
-    width: 345,
-    height: 345,
+    width: 300,
+    height: 300,
     quality: "auto",
     crop: 'fill',
     gravity: 'face',
