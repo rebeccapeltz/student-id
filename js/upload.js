@@ -10,6 +10,8 @@ const studentList = [];
 const IMG_HEIGHT = "440";
 const IMG_WIDTH = "300";
 
+
+
 function toast(message, type) {
   console.log("toast:", message, type);
   const fromColor = type === "warn" ? "pink" : "#00b09b";
@@ -126,35 +128,53 @@ function populateGallery(list) {
     }
   }
 }
+function renderStudents(){
 
+  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json?v=${Date.now()}`;
+  fetch(dataURL)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        //populate global studentList with image and meta-data
+        studentList.push(...data.resources);
+        populateGallery(studentList);
+      })
+      .catch(error=>{
+        console.log("error fetching list",error)
+      })
+}
+
+/*
 function loadStudents() {
   console.log("loadStudents");
-  fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`)
-    .then((response) => {
-      console.log("fetch status:", response.status);
-      if (response.status === 200) {
-        console.log(response);
+  const fetchDataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`;
+  console.log(fetchDataURL);
+  fetch(fetchDataURL)
+    .then(response => {
+      // console.log("fetch status:", response.status);
+      // if (response.status === 200) {
+        // console.log(response);
         response.json();
-      } else if (response.status === 404) {
+      // } else if (response.status === 404) {
         //TODO announce no users yet
-        toast("No student data yet.", "info");
-      }
+        // toast("No student data yet.", "info");
+      // }
     })
-    .then((data) => {
+    .then(data => {
       // console.log("fetched data",data.resources.length,data.resources);
-      if (data && data.resources) {
+      // if (data && data.resources) {
         console.log("fetched data", data.resources.length);
 
         //populate global studentList with image and meta-data
         studentList.push(...data.resources);
         populateGallery(studentList);
-      }
+      // }
     })
     .catch((error) => {
       console.log("error fetching list", error);
     });
 }
-
+*/
 // clear form after successful image upload
 function clearForm() {
   console.log("clearForm");
@@ -253,7 +273,8 @@ function deleteNoFaceImage(result) {
 document.addEventListener("DOMContentLoaded", (event) => {
   //disable upload button
   setUploadButton(false);
-  loadStudents();
+  renderStudents();
+  // loadStudents();
   // setTimeout(loadStudents, 5000);
 
   //listen for form inputs
