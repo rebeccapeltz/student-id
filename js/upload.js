@@ -10,8 +10,6 @@ const studentList = [];
 const IMG_HEIGHT = "440";
 const IMG_WIDTH = "300";
 
-
-
 function toast(message, type) {
   console.log("toast:", message, type);
   const fromColor = type === "warn" ? "pink" : "#00b09b";
@@ -128,20 +126,19 @@ function populateGallery(list) {
     }
   }
 }
-function renderStudents(){
-
-  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json?v=${Date.now()}`;
+function renderStudents() {
+  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/student-id.json`;
   fetch(dataURL)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        //populate global studentList with image and meta-data
-        studentList.push(...data.resources);
-        populateGallery(studentList);
-      })
-      .catch(error=>{
-        console.log("error fetching list",error)
-      })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      //populate global studentList with image and meta-data
+      studentList.push(...data.resources);
+      populateGallery(studentList);
+    })
+    .catch((error) => {
+      console.log("error fetching list", error);
+    });
 }
 
 /*
@@ -263,6 +260,7 @@ function deleteNoFaceImage(result) {
         "success deleting image without face",
         JSON.stringify(data, null, 2)
       );
+      //TODO the upload button should be turned back on
       toast("Image uploaded must have a face.", "warn");
     })
     .catch((error) => {
