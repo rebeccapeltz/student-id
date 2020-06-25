@@ -141,37 +141,7 @@ function renderStudents() {
     });
 }
 
-/*
-function loadStudents() {
-  console.log("loadStudents");
-  const fetchDataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/student-id.json`;
-  console.log(fetchDataURL);
-  fetch(fetchDataURL)
-    .then(response => {
-      // console.log("fetch status:", response.status);
-      // if (response.status === 200) {
-        // console.log(response);
-        response.json();
-      // } else if (response.status === 404) {
-        //TODO announce no users yet
-        // toast("No student data yet.", "info");
-      // }
-    })
-    .then(data => {
-      // console.log("fetched data",data.resources.length,data.resources);
-      // if (data && data.resources) {
-        console.log("fetched data", data.resources.length);
 
-        //populate global studentList with image and meta-data
-        studentList.push(...data.resources);
-        populateGallery(studentList);
-      // }
-    })
-    .catch((error) => {
-      console.log("error fetching list", error);
-    });
-}
-*/
 // clear form after successful image upload
 function clearForm() {
   console.log("clearForm");
@@ -260,7 +230,8 @@ function deleteNoFaceImage(result) {
         "success deleting image without face",
         JSON.stringify(data, null, 2)
       );
-      //TODO the upload button should be turned back on
+      //the upload button should be turned back on
+      setUploadButton(true);
       toast("Image uploaded must have a face.", "warn");
     })
     .catch((error) => {
