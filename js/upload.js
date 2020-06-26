@@ -105,14 +105,22 @@ function createGalleryEntry(student) {
   article.appendChild(imageContainer);
   return article;
 }
-function populateGallery(list) {
+
+// add a list of students to the galler
+// set prepend to true to insert list at the beginning:
+// useful for right after upload
+function populateGallery(list, prepend) {
   console.log("populateGallery");
   for (const student of list) {
     const encodedStudentData = createStudentData(student);
     if (encodedStudentData) {
       const article = createGalleryEntry(encodedStudentData);
       //append to gallery
-      document.querySelector("#gallery").appendChild(article);
+      if (prepend){
+        document.querySelector("#gallery").prepend(article);
+      } else {
+        document.querySelector("#gallery").appendChild(article);
+      }
     }
   }
 }
@@ -140,7 +148,10 @@ function clearForm() {
   document.querySelector("#lname").value = "";
   document.querySelector("#title").value = "";
   document.querySelector("#org").value = "";
-  document.querySelector("input[name=bgcolor]").value = ""; //deselect
+  document.querySelectorAll("input[name=bgcolor]").forEach(radio=>{
+    radio.checked = false;
+  })
+
 }
 
 // convert hex to dec
@@ -149,11 +160,7 @@ function hexdec(hex) {
       result * 16 + '0123456789abcdefgh'.indexOf(ch), 0);
 }
 
-// get highest contrast
-// function getContrast50($hexcolor){
-// 	return (hexdec($hexcolor) > 0xffffff/2)?'000000':'ffffff';
-// }
-
+// luminosity algorithm
 function getContrastL(hexcolor){
 	let r = hexdec(hexcolor.substr(0,2));
 	let g = hexdec(hexcolor.substr(2,2));
@@ -311,12 +318,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     "new student added:",
                     JSON.stringify(studentList)
                   );
-                  // add article to DOM
-                  // const article = createGalleryEntry(result.info);
-                  // document.querySelector("#gallery").appendChild(article);
 
-                  // put new student in an array and send to populate
-                  populateGallery([result.info]);
+                // put new student in an array and send to populate
+                  populateGallery([result.info],true);
                 } else {
                   console.log("Successful upload but no face!");
                   deleteNoFaceImage(result);
