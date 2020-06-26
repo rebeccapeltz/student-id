@@ -23,24 +23,10 @@ function toast(message, type) {
     backgroundColor: `linear-gradient(to right, ${fromColor}, ${toColor})`,
     stopOnFocus: true, // Prevents dismissing of toast on hover
   }).showToast();
-
-  //TODO add color to message
-  // const toastEl = document.querySelector("#toast");
-  // toastEl.className = "show";
-  // document.querySelector("#toast #desc").innerHTML = message;
-  // document.querySelector("#toast #img").innerHTML =
-  //   type && type === "warning" ? "!" : "OK";
-
-  // const typeClass = `toast-${type}`;
-  // toastEl.classList.add(typeClass);
-  // setTimeout(function () {
-  //   toastEl.className = toastEl.className.replace("show", "");
-  //   toastEl.classList.remove(typeClass);
-  // }, 5000);
 }
 
 function doubleEncode(str) {
-  console.log("double encode");
+  // console.log("double encode");
   if (!str) return "";
   let arr = str.split("");
   let newArr = [];
@@ -52,21 +38,22 @@ function doubleEncode(str) {
   return newStr;
 }
 
-//student should have context data: fname, lname, title, org, fcolor
+//student should have context data: fname, lname, title, org, bgcolor
 //add URL and fullname
 function createStudentData(student) {
-  console.log("createStudentData:", JSON.stringify(student, null, 2));
+  console.log("createStudentData");
+  // console.log("createStudentData:", JSON.stringify(student, null, 2));
   let contextMap = student && student.context ? student.context.custom : null;
   if (!contextMap) {
-    // toast("Missing student data");
-    //a student with no context
+    //a student with no context - fix by creating dummy context - this should never happen
+    //TODO look for a better way 
     console.log("No context:", JSON.stringify(student, null, 2));
     // create dummy context values
     contextMap = {
       public_id: "",
       fname: "",
       lname: "",
-      fcolor: "",
+      bgcolor: "", 
       title: "",
       org: "",
     };
@@ -74,11 +61,12 @@ function createStudentData(student) {
   // all data that will appear in overlay must be double encoded
   let studentData = { ...contextMap };
   studentData.publicId = student.public_id || "";
-  studentData.fullname = `${doubleEncode(
-    studentData.fname || ""
-  )}%20${doubleEncode(studentData.lname || "")}`;
+  studentData.fullname = `${doubleEncode(studentData.fname || "")}%20${doubleEncode(studentData.lname || "")}`;
   studentData.org = doubleEncode(studentData.org || "");
   studentData.title = doubleEncode(studentData.title || "");
+  let bgcolor = (studentData.bgcolor && studentData.bgcolor.length > 0) ? studentData.bgcolor : "231F20" ; //default is darkest
+  studentData.bgcolor = `!rgb:${bgcolor}!`; // does this need to be url encoded?
+  studentData.color = `!rgb:${getContrastL(bgcolor)}!`;//TODO calculate color
   let filler = Array(45).fill("%20").join("");
   //create overlay text
   const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`;
@@ -87,15 +75,16 @@ function createStudentData(student) {
     studentData.publicId,
     cl
       .transformation()
-      .variables([["$data", `${overlayText}`]])
-      .transformation("v-badge")
+      .variables([["$data", `${overlayText}`],["$color", `${studentData.color}`],["$bgcolor",`${studentData.bgcolor}`]])
+      .transformation("v-badge-color")
   );
   return studentData;
 }
 
 //create HTML
 function createGalleryEntry(student) {
-  console.log("createGalleryEntry:", JSON.stringify(student, null, 2));
+  console.log("createGalleryEntry:");
+  // console.log("createGalleryEntry:", JSON.stringify(student, null, 2));
   const article = document.createElement("article");
   article.classList.add("student-listing");
   //image container
@@ -117,6 +106,7 @@ function createGalleryEntry(student) {
   return article;
 }
 function populateGallery(list) {
+  console.log("populateGallery");
   for (const student of list) {
     const encodedStudentData = createStudentData(student);
     if (encodedStudentData) {
@@ -127,6 +117,7 @@ function populateGallery(list) {
   }
 }
 function renderStudents() {
+  console.log("renderStudents");
   const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/student-id.json`;
   fetch(dataURL)
     .then((response) => response.json())
@@ -149,7 +140,26 @@ function clearForm() {
   document.querySelector("#lname").value = "";
   document.querySelector("#title").value = "";
   document.querySelector("#org").value = "";
-  document.querySelector("#fcolor").value = "";
+  document.querySelector("input[name=bgcolor]").value = ""; //deselect
+}
+
+// convert hex to dec
+function hexdec(hex) {
+  return hex.toLowerCase().split('').reduce( (result, ch) =>
+      result * 16 + '0123456789abcdefgh'.indexOf(ch), 0);
+}
+
+// get highest contrast
+// function getContrast50($hexcolor){
+// 	return (hexdec($hexcolor) > 0xffffff/2)?'000000':'ffffff';
+// }
+
+function getContrastL(hexcolor){
+	let r = hexdec(hexcolor.substr(0,2));
+	let g = hexdec(hexcolor.substr(2,2));
+	let b = hexdec(hexcolor.substr(4,2));
+	let l = (r*0.2126)+(g*0.7152)+(b*0.0722);
+	return (l >= 128)? "000000": "ffffff";
 }
 
 // gather form data into context map
@@ -159,15 +169,16 @@ function createContextMap() {
   const lname = document.querySelector("#lname").value;
   const title = document.querySelector("#title").value;
   const org = document.querySelector("#org").value;
-  const fcolor = document.querySelector("#fcolor").value;
-  // console.log(fname, lname, title, org, fcolor);
+  const bgcolor = document.querySelector("input[type=radio]:checked").value;
+  // console.log(fname, lname, title, org, bgcolor);
   // add context
   const contextMap = {};
   contextMap.fname = fname;
   contextMap.lname = lname;
   contextMap.title = title;
   contextMap.org = org;
-  contextMap.fcolor = fcolor;
+  contextMap.bgcolor = bgcolor;
+  contextMap.color = getContrastL(bgcolor); 
   contextMap.uploadDate = new Date().toISOString();
   return contextMap;
 }
@@ -189,7 +200,7 @@ function dupFound(contextMap, studentList) {
 
 //boolean true enables the button and boolean false disable
 function setUploadButton(enable) {
-  console.log("setUploadButton");
+  console.log("setUploadButton",enable);
   if (enable) {
     document.querySelector("#upload").removeAttribute("disabled");
   } else {
@@ -199,13 +210,14 @@ function setUploadButton(enable) {
 
 //require all input data before image upload enabled
 function inputChanged() {
+  //turn on upload button after text entries
+  //choosing background not required
   console.log("inputChanged");
   if (
     document.querySelector("#fname").value.length > 0 &&
     document.querySelector("#lname").value.length > 0 &&
     document.querySelector("#title").value.length > 0 &&
-    document.querySelector("#org").value.length > 0 &&
-    document.querySelector("#fcolor").value.length > 0
+    document.querySelector("#org").value.length > 0 
   ) {
     setUploadButton(true);
   }
@@ -247,7 +259,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   // setTimeout(loadStudents, 5000);
 
   //listen for form inputs
-  document.querySelectorAll("input").forEach((el) => {
+  document.querySelectorAll('input:not([type="radio"]').forEach((el) => {
     el.addEventListener("input", inputChanged, false);
   });
 

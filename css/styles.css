@@ -1,7 +1,7 @@
 /* images */
 
 body {
-  padding: 5px;
+  padding: .3rem;
   font-family: arial, sans-serif;
   background: #f2f2f2;
 }
@@ -13,12 +13,12 @@ h1 {
   margin: 0;
 }
 h2 {
-  margin-bottom: 0 0.3em;
+  margin-bottom: 0 0.3rem;
 }
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-gap: 1em;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  grid-gap: 1rem;
 }
 
 
@@ -38,24 +38,20 @@ body {
 
 .form-inline label {
   margin: 0;
-  /* margin: 5px 10px 5px 0; */
-  /* margin: 5px 0; */
-  font-size: 0.8em;
+  font-size: 0.8rem;
   color: #0e2f5a;
 }
 
 .form-inline input {
   vertical-align: middle;
-  /* margin: 5px 10px 5px 0; */
-  /* margin: 5px 10px 5px 0; */
   margin: 0;
-  padding: 10px;
+  padding: .6rem;
   background-color: #fff;
-  border: 1px solid #ddd;
+  border: .3rem solid #ddd;
 }
 
 .form-inline button {
-  padding: 10px 20px;
+  padding: .6rem 1.2rem;
   background-color: #0e2f5a;
   border: 1px solid #ddd;
   color: white;
@@ -71,10 +67,10 @@ body {
 
 @media only screen and (min-width: 800px) {
   .form-inline label {
-    margin: 5px 10px 5px 10px;
+    margin: .3rem;
   }
   .form-inline button {
-    margin: 0 0 0 5px;
+    margin: 0 0 0 .3rem;
   }
   .form-inline button:disabled {
     background-color: gray;
@@ -82,7 +78,7 @@ body {
   }
 
   .form-inline input {
-    margin: 5px 0;
+    margin: .3rem 0;
   }
 }
 @media (max-width: 800px) {
@@ -91,11 +87,14 @@ body {
     flex-direction: column;
     align-items: stretch;
   }
+  .form-inline button {
+    margin-top: .3rem;
+  }
   h1 {
-    font-size: 1.3em;
+    font-size: 1.3rem;
   }
   h2 {
-    font-size: 1em;
+    font-size: 1rem;
   }
 }
 
@@ -109,30 +108,30 @@ body {
 
 #toast {
   visibility: hidden;
-  max-width: 150px;
-  height: 50px;
+  max-width: 9rem;
+  height: 3rem;
   /*margin-left: -125px;*/
   margin: auto;
   background-color: #333;
   color: #fff;
   text-align: center;
-  border-radius: 2px;
+  border-radius: .1rem;
 
   position: fixed;
   z-index: 1;
   left: 0;
   right: 0;
-  bottom: 30px;
-  font-size: 13px;
+  bottom: 1.9rem;
+  font-size: .8rem;
   white-space: nowrap;
 }
 #toast #img {
-  width: 50px;
-  height: 50px;
+  width: 3rem;
+  height: 3rem;
   text-align: center;
   float: left;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   box-sizing: border-box;
   background-color: #111;
   color: #fff;
@@ -140,7 +139,7 @@ body {
 #toast #desc {
   color: #fff;
   text-align: left;
-  padding: 16px;
+  padding: 1rem;
   overflow: hidden;
   white-space: nowrap;
 }
@@ -177,59 +176,59 @@ body {
 
 @-webkit-keyframes expand {
   from {
-    min-width: 50px;
+    min-width: 3rem;
   }
   to {
-    min-width: 350px;
+    min-width: 22rem;
   }
 }
 
 @keyframes expand {
   from {
-    min-width: 50px;
+    min-width: 3rem;
   }
   to {
-    min-width: 350px;
+    min-width: 22rem;
   }
 }
 @-webkit-keyframes stay {
   from {
-    min-width: 350px;
+    min-width: 22rem;
   }
   to {
-    min-width: 350px;
+    min-width: 22rem;
   }
 }
 
 @keyframes stay {
   from {
-    min-width: 350px;
+    min-width: 22rem;
   }
   to {
-    min-width: 350px;
+    min-width: 22rem;
   }
 }
 @-webkit-keyframes shrink {
   from {
-    min-width: 350px;
+    min-width: 22rem;
   }
   to {
-    min-width: 50px;
+    min-width: 3rem;
   }
 }
 
 @keyframes shrink {
   from {
-    min-width: 350px;
+    min-width: 22rem;
   }
   to {
-    min-width: 50px;
+    min-width: 3rem;
   }
 }
 
 @-webkit-keyframes fadeout {
   from {
-    bottom: 30px;
+    bottom: 2rem;
     opacity: 1;
   }
   to {
@@ -240,11 +239,66 @@ body {
 
 @keyframes fadeout {
   from {
-    bottom: 30px;
+    bottom: 4rem;
     opacity: 1;
   }
   to {
-    bottom: 60px;
+    bottom: 4rem;
     opacity: 0;
   }
+}
+
+/* color select */
+.color-container {
+  display: inline-block;
+  /* margin: 0 0 5px 0; */
+}
+input[type="radio"] {
+  display: none;
+}
+input[type="radio"]:checked + label span {
+  transform: scale(1.25);
+}
+input[type="radio"]:checked + label .y1 {
+  border: 2px solid #000;
+}
+input[type="radio"]:checked + label .y2 {
+  border: 2px solid #000;
+}
+input[type="radio"]:checked + label .y3 {
+  border: 2px solid #000;
+}
+
+
+label.color {
+  display: inline-block;
+  width: 2em;
+  height: 25px;
+  margin-right: 2px;
+  cursor: pointer;
+}
+
+label.color span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform .2s ease-in-out;
+}
+label.color span.y1 {
+  background: #F2D865;
+}
+label.color span.y2 {
+  background: #F4B21B;
+}
+label.color span.y3 {
+  background: #DB8226;
+}
+label.color span.b1 {
+  background: #0071BA;
+}
+label.color span.b2 {
+  background: #0E2F5A;
+}
+label.color span.b3 {
+  background: #231F20;
 }
