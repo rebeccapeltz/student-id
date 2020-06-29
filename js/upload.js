@@ -1,5 +1,7 @@
 const PARAMS = new URLSearchParams(window.location.search);
 const CLOUD_NAME = PARAMS.has("cn") ? PARAMS.get("cn") : "pictures77";
+const COURSE_TITLE = PARAMS.has("title")? PARAMS.get("title"): "Cloudinary Training";
+const COURSE_DATE = PARAMS.has("date")? PARAMS.get("date"):"2020"
 const PRESET = "student-id";
 const BADGE_TRANSFORM = "t_v-badge";
 const NOT_ALLOW_DUPS = true;
@@ -9,6 +11,11 @@ const cl = new cloudinary.Cloudinary({ cloud_name: CLOUD_NAME, secure: true });
 const studentList = [];
 const IMG_HEIGHT = "440";
 const IMG_WIDTH = "300";
+
+function setCourseTitleAndDate(){
+  document.querySelector("#course-title").innerHTML = COURSE_TITLE;
+  document.querySelector("#course-date").innerHTML = COURSE_DATE;
+}
 
 function toast(message, type) {
   console.log("toast:", message, type);
@@ -176,7 +183,15 @@ function createContextMap() {
   const lname = document.querySelector("#lname").value;
   const title = document.querySelector("#title").value;
   const org = document.querySelector("#org").value;
-  const bgcolor = document.querySelector("input[type=radio]:checked").value;
+  let bgcolor = "231F20"; //default is dark color
+  if (document.querySelector("input[name=bgcolor]:checked")){
+    bgcolor = document.querySelector("input[name=bgcolor]:checked").value;
+  } 
+  // if (document.getElementById('r1').checked) {
+  //   rate_value = document.getElementById('r1').value;
+  // }
+  // const bgcolor = document.querySelector("input[type=radio]:checked").value;
+  // const bgcolor = idocument.querySelector("input[name=rate]:checked").value;
   // console.log(fname, lname, title, org, bgcolor);
   // add context
   const contextMap = {};
@@ -258,8 +273,10 @@ function deleteNoFaceImage(result) {
     });
 }
 
+
 document.addEventListener("DOMContentLoaded", (event) => {
   //disable upload button
+  setCourseTitleAndDate();
   setUploadButton(false);
   renderStudents();
   // loadStudents();
