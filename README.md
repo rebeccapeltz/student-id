@@ -1,5 +1,9 @@
 # Virtual Student ID Badge
 
+<a href="https://www.beckypeltz.me/student-id/index.html?cn=pictures77&title=Advanced%20Concepts&date=August%202020" target="_blank">Demo</a>
+
+<img src="./images/sample-student-set.jpg" alt="sample" height="300" width="700">
+
 You can use your Cloudinary account as a Database for student images and information that will go into creating an ID badge.  
 
 This web application can be harnessed to upload student information to the Cloud and create a web page with all student image and data made publicly available on the Web.
@@ -13,9 +17,9 @@ The steps to prepare for for using this app are:
 3. Run the script `create-named-badge-xform.js`. This script will create the transformation that will overlay student supplied data: name, title, organization to the badge, as well as apply background and foreground color to the student information.
 4. Supply a URL to students for a particular course like this: 
 ```bash
-https://path.to.app/index.html?cn=cloud_name&course-title=course%20title&course-date=course%data
+https://path.to.app/index.html?cn=cloud_name&title=course%20title&date=course%data
 ```
-Use the Cloud Name for the cloud you created in step 1 for **cn**.  Add a URL encoded string for **course-title** and **course-date**.  The title and date should show up in your header.
+Use the Cloud Name for the cloud you created in step 1 for **cn**.  Add a URL encoded string for **title** and **date**.  The title and date should show up in your header.
 5. We are adding a version with current epoch time to bust the cache so that we can pick up new images with the **student-id** tag without running into caching problems.  
 You can also accomplish cache busting with a setting in your cloud.  You need to get support to help with that and it shouldn't be necessary. Cloudinary admin cloud setting for list sync: 
 ![list setting](./images/list-setting.jpg)
