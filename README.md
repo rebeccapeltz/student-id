@@ -9,11 +9,13 @@ The script for the Web page will expect a query string with `cn:cloud_name` key/
 The steps to prepare for for using this app are: 
 
 1. Create a Cloudinary cloud.
-2. Run the script `create-student-id-preset.js`.  This script sets up instructions for cropping, foldering and tagging the images uploaded.  note: The upload script will also add user supplied context data and require that the image uploaded contains a face.
-3. Run the script `create-named-badge-xform.js`. This script will create the transformation that will overlay student supplied data: name, title, organization to the badge.
+2. Run the script `create-student-id-preset.js`.  This script sets up instructions for cropping, folder-ing and tagging the images uploaded.  note: The upload script will also add user supplied context data and require that the image uploaded contains a face.  The folder and tag are the same: **student-id**.
+3. Run the script `create-named-badge-xform.js`. This script will create the transformation that will overlay student supplied data: name, title, organization to the badge, as well as apply background and foreground color to the student information.
 4. Supply a URL to students for a particular course like this: 
 ```bash
-https://path.to.app/index.html?cn=cloud_name
+https://path.to.app/index.html?cn=cloud_name&course-title=course%20title&course-date=course%data
 ```
-5. Cloudinary admin cloud setting for list sync: 
+Use the Cloud Name for the cloud you created in step 1 for **cn**.  Add a URL encoded string for **course-title** and **course-date**.  The title and date should show up in your header.
+5. We are adding a version with current epoch time to bust the cache so that we can pick up new images with the **student-id** tag without running into caching problems.  
+You can also accomplish cache busting with a setting in your cloud.  You need to get support to help with that and it shouldn't be necessary. Cloudinary admin cloud setting for list sync: 
 ![list setting](./images/list-setting.jpg)
