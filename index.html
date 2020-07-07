@@ -4,20 +4,44 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>upload widget</title>
-    <link rel="icon" href="favicon.png" type="image/png" >
-
+    <link rel="icon" href="favicon.png" type="image/png" />
 
     <link
       rel="stylesheet"
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
     />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap"
+      rel="stylesheet"
+    />
     <link href="./css/styles.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <h1>Student ID: <span id="course-title">Fundamentals For Developers</span> <span id="course-date">August 2020</span></h1>
+    <div id="banner" class="banner top full">
+      <p>
+        This web page is to be used for instructional purposes. The data entered
+        is stored as meta data with your image on the course's Cloudinary
+        account. We ask that you don't share the link to this site publicly. You
+        can remove your data from this page by supplying the first name and last
+        name associated with your picture. This will open your email app and it
+        will be forwarded to training for deletion.
+      </p>
+      <p>
+        To delete your image and data from this page, provide first name and
+        last name used to create Student id:
+        <input type="text" id="delete-fname" placeholder="First Name" />
+        <input type="text" id="delete-lname" placeholder="Last name" />
+        <button type="button" id="delete-btn">Delete</button>
+      </p>
+      <a class="close-msg" href="#">OK</a>
+    </div>
+
+    <h1>
+      Student ID: <span id="course-title">Fundamentals For Developers</span>
+      <span id="course-date">August 2020</span>
+    </h1>
     <h2>Create a Badge</h2>
     <form class="form-inline">
       <label for="fname">First name:</label><br />

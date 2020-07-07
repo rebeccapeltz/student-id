@@ -155,3 +155,54 @@ label.color span.b3 {
 .toastify {
   font-family: arial, sans-serif;
 }
+
+/* banner */
+.banner {
+  font-family: 'Times New Roman', Times, serif;
+  color: white;
+  background-color: #231F20;
+  padding: 1rem;
+  font-size: .9rem;
+}
+.banner.top {
+  display: block;
+  border-bottom: 2px solid #231F20;
+  top: -350px;
+  transition: top .5s;
+}
+.banner.top.show {
+  display: block;
+  top: 0;
+  margin-top: 0px;
+  transition: top 1s;
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+}
+.banner.top.hide {
+  display: none;
+  top: 0;
+  margin-top: 0px;
+  transition: top 1s;
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+}
+.banner.full {
+  left: 0;
+  margin: 0px;
+  width: 100%;
+}
+.banner .close-msg {
+  /* float: left; */
+  margin: 15px;
+  width: 100px;
+  height: 40px;
+  z-index: 100;
+  background: #DB8226;
+  text-transform: uppercase;
+  line-height: 28px;
+  padding-top: 8px;
+  display: inline-block;
+  color: #FFF;
+  text-align: center;
+  text-decoration: none;
+}

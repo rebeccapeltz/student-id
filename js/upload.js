@@ -279,8 +279,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
   setCourseTitleAndDate();
   setUploadButton(false);
   renderStudents();
-  // loadStudents();
-  // setTimeout(loadStudents, 5000);
+  document.querySelector('.close-msg').addEventListener('click',event=>{
+    document.querySelector('#banner').classList.remove('show');
+    document.querySelector('#banner').classList.add('hide');
+  })
+  document.querySelector('#delete-btn').addEventListener('click',event=>{
+    let fname = document.querySelector('#delete-fname').value || 'first name not provided'
+    let lname = document.querySelector('#delete-lname').value || 'last name not provided'
+    let emailBody = `Delete ${fname} ${lname} from Student ID application for cloud ${CLOUD_NAME}`
+    window.open(`mailto:support@cloudinary.com?subject=Remove me from Student ID Website&body=${emailBody}`)
+  })
 
   //listen for form inputs
   document.querySelectorAll('input:not([type="radio"]').forEach((el) => {
