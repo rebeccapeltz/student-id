@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
           {
             cloudName: CLOUD_NAME,
             upload_preset: PRESET,
-            sources: ["local", "url", "camera"],
+            sources: ["local", "url", "camera","facebook"],
             context: contextMap,
             clientAllowedFormats: ["png", "gif", "jpeg"],
             return_delete_token: 1,
