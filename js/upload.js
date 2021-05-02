@@ -1,8 +1,8 @@
 const PARAMS = new URLSearchParams(window.location.search);
-const CLOUD_NAME = PARAMS.has("cn") ? PARAMS.get("cn") : "djh67gzdu";
-const COURSE_TITLE = PARAMS.has("title") ? PARAMS.get("title") : "Cloudinary";
-const COURSE_DATE = PARAMS.has("date") ? PARAMS.get("date") : "2020";
-const BADGE = PARAMS.has("badge") ? PARAMS.get("badge") : "";
+const CLOUD_NAME = PARAMS.has("cn") ? PARAMS.get("cn") : "my_cloud_name";
+const COURSE_TITLE = PARAMS.has("title") ? PARAMS.get("title") : "my_course_title";
+const COURSE_DATE = PARAMS.has("date") ? PARAMS.get("date") : "my_course_date";
+const BADGE = PARAMS.has("badge") ? PARAMS.get("badge") : "badge";
 
 const NOT_ALLOW_DUPS = true;
 const CONFIG = {};
@@ -280,19 +280,19 @@ function deleteNoFaceImage(result) {
 }
 
 function getConfig() {
-  if (BADGE && BADGE.length > 0){
+  // if (BADGE && BADGE.length > 0){
     CONFIG.identifier = BADGE;
     CONFIG.preset = `${BADGE}-preset`;
     return true;
-  }
-  let identifier = prompt("Please enter a badge:");
-  if (identifier && identifier.length > 0) {
-    CONFIG.identifier = identifier;
-    CONFIG.preset = `${identifier}-preset`;
-    return true;
-  } else {
-    return false;
-  }
+  // }
+  // let identifier = prompt("Please enter a badge:");
+  // if (identifier && identifier.length > 0) {
+  //   CONFIG.identifier = identifier;
+  //   CONFIG.preset = `${identifier}-preset`;
+  //   return true;
+  // } else {
+  //   return false;
+  // }
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
