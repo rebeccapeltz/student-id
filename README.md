@@ -56,3 +56,7 @@ https://badge.cloudinary.training/index.html?cn=djh67gzdu&title=CSM%20Test&date=
 
 
 
+## local functions test **  
+http://localhost:52543/.netlify/functions/test
+
+post raw json

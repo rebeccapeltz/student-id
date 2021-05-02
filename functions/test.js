@@ -1,27 +1,33 @@
+
+
+
 exports.handler = function (event, context, callback) {
   // post only
 
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed!" };
-  } else {
-    return { statusCode: 200, body: "post" };
-  }
+  } 
+  // else {
+  //   return { statusCode: 200, body: "post" };
+  // }
 
   // return { statusCode: 200, body: JSON.stringify({ message: "post" }) };
 
-  // const params = querystring.parse(event.body);
-  // const name = params.name || "World";
+  const params = querystring.parse(event.body);
+  const name = JSON.parse(event.body).name;
+  //params.name || "World";
+  console.log("name",name, );
 
   // callback(null, {
   //   statusCode: 200,
-  //   body: JSON.stringify({ message: "Hello, world ${name}" }),
+  //   body: JSON.stringify({ message: `Hello, ${name}` }),
   // });
 
-  // callback(null, {
-  //   statusCode: 200,
-  //   body: JSON.stringify({
-  //     dirname:__dirname,
-  //     files:files,
-  //   })
-  // })
+return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: `Hello, ${name}`
+    }),
+  };
+  
 };
