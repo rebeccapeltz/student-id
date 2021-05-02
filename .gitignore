@@ -3,3 +3,5 @@ my-notes.md
 node_modules/
 test/
 marketing/
+# Local Netlify folder
+.netlify
