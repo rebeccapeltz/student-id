@@ -1,10 +1,11 @@
 const PARAMS = new URLSearchParams(window.location.search);
-const CLOUD_NAME = PARAMS.has("cn") ? PARAMS.get("cn") : "pictures77";
-const COURSE_TITLE = PARAMS.has("title")? PARAMS.get("title"): "Cloudinary Training";
-const COURSE_DATE = PARAMS.has("date")? PARAMS.get("date"):"2020"
-const PRESET = "student-id";
-const BADGE_TRANSFORM = "t_v-badge";
+const CLOUD_NAME = PARAMS.has("cn") ? PARAMS.get("cn") : "djh67gzdu";
+const COURSE_TITLE = PARAMS.has("title") ? PARAMS.get("title") : "Cloudinary";
+const COURSE_DATE = PARAMS.has("date") ? PARAMS.get("date") : "2020";
+const BADGE = PARAMS.has("badge") ? PARAMS.get("badge") : "";
+
 const NOT_ALLOW_DUPS = true;
+const CONFIG = {};
 
 const cl = new cloudinary.Cloudinary({ cloud_name: CLOUD_NAME, secure: true });
 
@@ -12,7 +13,7 @@ const studentList = [];
 const IMG_HEIGHT = "440";
 const IMG_WIDTH = "300";
 
-function setCourseTitleAndDate(){
+function setCourseTitleAndDate() {
   document.querySelector("#course-title").innerHTML = COURSE_TITLE;
   document.querySelector("#course-date").innerHTML = COURSE_DATE;
 }
@@ -45,22 +46,20 @@ function doubleEncode(str) {
   return newStr;
 }
 
-//student should have context data: fname, lname, title, org, bgcolor
+//student should have context data: fname, lname, email,title, org, bgcolor
 //add URL and fullname
 function createStudentData(student) {
-  console.log("createStudentData");
-  // console.log("createStudentData:", JSON.stringify(student, null, 2));
   let contextMap = student && student.context ? student.context.custom : null;
   if (!contextMap) {
     //a student with no context - fix by creating dummy context - this should never happen
-    //TODO look for a better way 
     console.log("No context:", JSON.stringify(student, null, 2));
     // create dummy context values
     contextMap = {
       public_id: "",
       fname: "",
       lname: "",
-      bgcolor: "", 
+      email: "",
+      bgcolor: "",
       title: "",
       org: "",
     };
@@ -68,12 +67,18 @@ function createStudentData(student) {
   // all data that will appear in overlay must be double encoded
   let studentData = { ...contextMap };
   studentData.publicId = student.public_id || "";
-  studentData.fullname = `${doubleEncode(studentData.fname || "")}%20${doubleEncode(studentData.lname || "")}`;
+  studentData.fullname = `${doubleEncode(
+    studentData.fname || ""
+  )}%20${doubleEncode(studentData.lname || "")}`;
+  student.email = doubleEncode(studentData.email || "");
   studentData.org = doubleEncode(studentData.org || "");
   studentData.title = doubleEncode(studentData.title || "");
-  let bgcolor = (studentData.bgcolor && studentData.bgcolor.length > 0) ? studentData.bgcolor : "231F20" ; //default is darkest
+  let bgcolor =
+    studentData.bgcolor && studentData.bgcolor.length > 0
+      ? studentData.bgcolor
+      : "231F20"; //default is darkest
   studentData.bgcolor = `!rgb:${bgcolor}!`; // does this need to be url encoded?
-  studentData.color = `!rgb:${getContrastL(bgcolor)}!`;//TODO calculate color
+  studentData.color = `!rgb:${getContrastL(bgcolor)}!`;
   let filler = Array(45).fill("%20").join("");
   //create overlay text
   const overlayText = `!${studentData.fullname}%250A${studentData.title}%250A${studentData.org}%250A${filler}!`;
@@ -82,7 +87,11 @@ function createStudentData(student) {
     studentData.publicId,
     cl
       .transformation()
-      .variables([["$data", `${overlayText}`],["$color", `${studentData.color}`],["$bgcolor",`${studentData.bgcolor}`]])
+      .variables([
+        ["$data", `${overlayText}`],
+        ["$color", `${studentData.color}`],
+        ["$bgcolor", `${studentData.bgcolor}`],
+      ])
       .transformation("v-badge-color")
   );
   return studentData;
@@ -91,7 +100,6 @@ function createStudentData(student) {
 //create HTML
 function createGalleryEntry(student) {
   console.log("createGalleryEntry:");
-  // console.log("createGalleryEntry:", JSON.stringify(student, null, 2));
   const article = document.createElement("article");
   article.classList.add("student-listing");
   //image container
@@ -123,7 +131,7 @@ function populateGallery(list, prepend) {
     if (encodedStudentData) {
       const article = createGalleryEntry(encodedStudentData);
       //append to gallery
-      if (prepend){
+      if (prepend) {
         document.querySelector("#gallery").prepend(article);
       } else {
         document.querySelector("#gallery").appendChild(article);
@@ -133,7 +141,7 @@ function populateGallery(list, prepend) {
 }
 function renderStudents() {
   console.log("renderStudents");
-  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/student-id.json`;
+  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/${CONFIG.identifier}.json`;
   fetch(dataURL)
     .then((response) => response.json())
     .then((data) => {
@@ -147,33 +155,34 @@ function renderStudents() {
     });
 }
 
-
 // clear form after successful image upload
 function clearForm() {
   console.log("clearForm");
   document.querySelector("#fname").value = "";
   document.querySelector("#lname").value = "";
+  document.querySelector("#email").value = "";
   document.querySelector("#title").value = "";
   document.querySelector("#org").value = "";
-  document.querySelectorAll("input[name=bgcolor]").forEach(radio=>{
+  document.querySelectorAll("input[name=bgcolor]").forEach((radio) => {
     radio.checked = false;
-  })
-
+  });
 }
 
 // convert hex to dec
 function hexdec(hex) {
-  return hex.toLowerCase().split('').reduce( (result, ch) =>
-      result * 16 + '0123456789abcdefgh'.indexOf(ch), 0);
+  return hex
+    .toLowerCase()
+    .split("")
+    .reduce((result, ch) => result * 16 + "0123456789abcdefgh".indexOf(ch), 0);
 }
 
 // luminosity algorithm
-function getContrastL(hexcolor){
-	let r = hexdec(hexcolor.substr(0,2));
-	let g = hexdec(hexcolor.substr(2,2));
-	let b = hexdec(hexcolor.substr(4,2));
-	let l = (r*0.2126)+(g*0.7152)+(b*0.0722);
-	return (l >= 128)? "000000": "ffffff";
+function getContrastL(hexcolor) {
+  let r = hexdec(hexcolor.substr(0, 2));
+  let g = hexdec(hexcolor.substr(2, 2));
+  let b = hexdec(hexcolor.substr(4, 2));
+  let l = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  return l >= 128 ? "000000" : "ffffff";
 }
 
 // gather form data into context map
@@ -181,26 +190,23 @@ function createContextMap() {
   console.log("createContextMap");
   const fname = document.querySelector("#fname").value;
   const lname = document.querySelector("#lname").value;
+  const email = document.querySelector("#email").value;
   const title = document.querySelector("#title").value;
   const org = document.querySelector("#org").value;
   let bgcolor = "231F20"; //default is dark color
-  if (document.querySelector("input[name=bgcolor]:checked")){
+  if (document.querySelector("input[name=bgcolor]:checked")) {
     bgcolor = document.querySelector("input[name=bgcolor]:checked").value;
-  } 
-  // if (document.getElementById('r1').checked) {
-  //   rate_value = document.getElementById('r1').value;
-  // }
-  // const bgcolor = document.querySelector("input[type=radio]:checked").value;
-  // const bgcolor = idocument.querySelector("input[name=rate]:checked").value;
-  // console.log(fname, lname, title, org, bgcolor);
+  }
+
   // add context
   const contextMap = {};
   contextMap.fname = fname;
   contextMap.lname = lname;
+  contextMap.email = email;
   contextMap.title = title;
   contextMap.org = org;
   contextMap.bgcolor = bgcolor;
-  contextMap.color = getContrastL(bgcolor); 
+  contextMap.color = getContrastL(bgcolor);
   contextMap.uploadDate = new Date().toISOString();
   return contextMap;
 }
@@ -222,7 +228,7 @@ function dupFound(contextMap, studentList) {
 
 //boolean true enables the button and boolean false disable
 function setUploadButton(enable) {
-  console.log("setUploadButton",enable);
+  console.log("setUploadButton", enable);
   if (enable) {
     document.querySelector("#upload").removeAttribute("disabled");
   } else {
@@ -239,7 +245,7 @@ function inputChanged() {
     document.querySelector("#fname").value.length > 0 &&
     document.querySelector("#lname").value.length > 0 &&
     document.querySelector("#title").value.length > 0 &&
-    document.querySelector("#org").value.length > 0 
+    document.querySelector("#org").value.length > 0
   ) {
     setUploadButton(true);
   }
@@ -273,22 +279,46 @@ function deleteNoFaceImage(result) {
     });
 }
 
+function getConfig() {
+  if (BADGE && BADGE.length > 0){
+    CONFIG.identifier = BADGE;
+    CONFIG.preset = `${BADGE}-preset`;
+    return true;
+  }
+  let identifier = prompt("Please enter a badge:");
+  if (identifier && identifier.length > 0) {
+    CONFIG.identifier = identifier;
+    CONFIG.preset = `${identifier}-preset`;
+    return true;
+  } else {
+    return false;
+  }
+}
 
 document.addEventListener("DOMContentLoaded", (event) => {
+  //modal to get identifier
+  // document.querySelector("#page").style.display = "none"
+  if (!getConfig()) {
+    alert("You need to enter an identifier to process");
+    return
+  } else {
+    document.querySelector("#page").style.display = "block"
+  }
   //disable upload button
   setCourseTitleAndDate();
   setUploadButton(false);
   renderStudents();
-  document.querySelector('.close-msg').addEventListener('click',event=>{
-    document.querySelector('#banner').classList.remove('show');
-    document.querySelector('#banner').classList.add('hide');
-  })
-  document.querySelector('#delete-btn').addEventListener('click',event=>{
-    let fname = document.querySelector('#delete-fname').value || 'first name not provided'
-    let lname = document.querySelector('#delete-lname').value || 'last name not provided'
-    let emailBody = `Delete ${fname} ${lname} from Student ID application for cloud ${CLOUD_NAME}`
-    window.open(`mailto:support@cloudinary.com?subject=Remove me from Student ID Website&body=${emailBody}`)
-  })
+  document.querySelector("#delete-btn").addEventListener("click", (event) => {
+    let fname =
+      document.querySelector("#delete-fname").value ||
+      "first name not provided";
+    let lname =
+      document.querySelector("#delete-lname").value || "last name not provided";
+    let emailBody = `Delete ${fname} ${lname} from Student ID application for cloud ${CLOUD_NAME}`;
+    window.open(
+      `mailto:support@cloudinary.com?subject=Remove me from Student ID Website&body=${emailBody}`
+    );
+  });
 
   //listen for form inputs
   document.querySelectorAll('input:not([type="radio"]').forEach((el) => {
@@ -310,10 +340,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
         var myWidget = cloudinary.createUploadWidget(
           {
             cloudName: CLOUD_NAME,
-            upload_preset: PRESET,
-            sources: ["local", "url", "camera","facebook"],
+            upload_preset: `${CONFIG.preset}`,
+            sources: ["local", "url", "camera", "facebook"],
             context: contextMap,
-            clientAllowedFormats: ["png", "gif", "jpeg"],
+            clientAllowedFormats: ["png", "jpeg"],
             return_delete_token: 1,
           },
           (error, result) => {
@@ -334,9 +364,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                   toast("Successful face upload.", "info");
                   clearForm();
                   //add image to gallery
-                  // XXXXXXXXXXdocument.querySelector("#gallery").innerHTML = "";
-
-                  //TODO TRY add to list add to DOM - otherwise need to call load
                   // add student to list
                   studentList.push(result.info);
                   console.log(
@@ -344,8 +371,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     JSON.stringify(studentList)
                   );
 
-                // put new student in an array and send to populate
-                  populateGallery([result.info],true);
+                  // put new student in an array and send to populate
+                  populateGallery([result.info], true);
                 } else {
                   console.log("Successful upload but no face!");
                   deleteNoFaceImage(result);
