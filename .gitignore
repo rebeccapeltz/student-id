@@ -5,3 +5,4 @@ test/
 marketing/
 # Local Netlify folder
 .netlify
+toml.txt
