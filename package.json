@@ -19,6 +19,8 @@
   "dependencies": {
     "cloudinary": "^1.22.0",
     "cloudinary-core": "^2.8.2",
-    "open": "^7.0.4"
+    "dotenv": "^10.0.0",
+    "open": "^7.0.4",
+    "lodash": "^4.17.21"
   }
 }
