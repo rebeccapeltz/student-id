@@ -1,6 +1,8 @@
 const PARAMS = new URLSearchParams(window.location.search);
 const CLOUD_NAME = PARAMS.has("cn") ? PARAMS.get("cn") : "my_cloud_name";
-const COURSE_TITLE = PARAMS.has("title") ? PARAMS.get("title") : "my_course_title";
+const COURSE_TITLE = PARAMS.has("title")
+  ? PARAMS.get("title")
+  : "my_course_title";
 const COURSE_DATE = PARAMS.has("date") ? PARAMS.get("date") : "my_course_date";
 const BADGE = PARAMS.has("badge") ? PARAMS.get("badge") : "badge";
 
@@ -141,9 +143,17 @@ function populateGallery(list, prepend) {
 }
 function renderStudents() {
   console.log("renderStudents");
-  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/${CONFIG.identifier}.json`;
+  const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/${
+    CONFIG.identifier
+  }.json`;
   fetch(dataURL)
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.status === 404) {
+        console.log('no data found');
+      } else {
+        return response.json();
+      }
+    })
     .then((data) => {
       console.log(data);
       //populate global studentList with image and meta-data
@@ -281,9 +291,9 @@ function deleteNoFaceImage(result) {
 
 function getConfig() {
   // if (BADGE && BADGE.length > 0){
-    CONFIG.identifier = BADGE;
-    CONFIG.preset = `${BADGE}-preset`;
-    return true;
+  CONFIG.identifier = BADGE;
+  CONFIG.preset = `${BADGE}-preset`;
+  return true;
   // }
   // let identifier = prompt("Please enter a badge:");
   // if (identifier && identifier.length > 0) {
@@ -300,9 +310,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
   // document.querySelector("#page").style.display = "none"
   if (!getConfig()) {
     alert("You need to enter an identifier to process");
-    return
+    return;
   } else {
-    document.querySelector("#page").style.display = "block"
+    document.querySelector("#page").style.display = "block";
   }
   //disable upload button
   setCourseTitleAndDate();
