@@ -146,13 +146,10 @@ function renderStudents() {
   const dataURL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/v${Date.now()}/${
     CONFIG.identifier
   }.json`;
+
   fetch(dataURL)
-    .then((response) => {
-      if (response.status === 404) {
-        console.log('no data found');
-      } else {
-        return response.json();
-      }
+    .then((resp) => {
+      return resp.json();
     })
     .then((data) => {
       console.log(data);
