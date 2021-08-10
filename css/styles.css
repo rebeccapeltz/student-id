@@ -68,7 +68,7 @@ h1,h2 {
 
 @media only screen and (min-width: 800px) {
   .form-inline label {
-    margin: .3rem;
+    margin: .2rem;
   }
   .form-inline button {
     margin: 0 0 0 .3rem;
